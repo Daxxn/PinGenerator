@@ -1,0 +1,51 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32228.430
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PinGenerator", "PinGenerator\PinGenerator.csproj", "{3F6CE490-E89B-4771-92B4-C52A1AFD8A70}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MVVMLibrary", "..\..\Libraries\MVVMLibrary\MVVMLibrary\MVVMLibrary.csproj", "{284CC45A-8804-4491-9A4E-314D5AE26EF0}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JsonReaderLibrary", "..\..\Libraries\JsonReaderLibrary\JsonReaderLibrary\JsonReaderLibrary.csproj", "{C825CC0A-1442-4011-8F17-19AD08C9F5D5}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release_1|Any CPU = Release_1|Any CPU
+		Release|Any CPU = Release|Any CPU
+		Release1|Any CPU = Release1|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3F6CE490-E89B-4771-92B4-C52A1AFD8A70}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3F6CE490-E89B-4771-92B4-C52A1AFD8A70}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3F6CE490-E89B-4771-92B4-C52A1AFD8A70}.Release_1|Any CPU.ActiveCfg = Release|Any CPU
+		{3F6CE490-E89B-4771-92B4-C52A1AFD8A70}.Release_1|Any CPU.Build.0 = Release|Any CPU
+		{3F6CE490-E89B-4771-92B4-C52A1AFD8A70}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3F6CE490-E89B-4771-92B4-C52A1AFD8A70}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3F6CE490-E89B-4771-92B4-C52A1AFD8A70}.Release1|Any CPU.ActiveCfg = Release|Any CPU
+		{3F6CE490-E89B-4771-92B4-C52A1AFD8A70}.Release1|Any CPU.Build.0 = Release|Any CPU
+		{284CC45A-8804-4491-9A4E-314D5AE26EF0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{284CC45A-8804-4491-9A4E-314D5AE26EF0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{284CC45A-8804-4491-9A4E-314D5AE26EF0}.Release_1|Any CPU.ActiveCfg = Release_1|Any CPU
+		{284CC45A-8804-4491-9A4E-314D5AE26EF0}.Release_1|Any CPU.Build.0 = Release_1|Any CPU
+		{284CC45A-8804-4491-9A4E-314D5AE26EF0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{284CC45A-8804-4491-9A4E-314D5AE26EF0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{284CC45A-8804-4491-9A4E-314D5AE26EF0}.Release1|Any CPU.ActiveCfg = Release|Any CPU
+		{284CC45A-8804-4491-9A4E-314D5AE26EF0}.Release1|Any CPU.Build.0 = Release|Any CPU
+		{C825CC0A-1442-4011-8F17-19AD08C9F5D5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C825CC0A-1442-4011-8F17-19AD08C9F5D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C825CC0A-1442-4011-8F17-19AD08C9F5D5}.Release_1|Any CPU.ActiveCfg = Release|Any CPU
+		{C825CC0A-1442-4011-8F17-19AD08C9F5D5}.Release_1|Any CPU.Build.0 = Release|Any CPU
+		{C825CC0A-1442-4011-8F17-19AD08C9F5D5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C825CC0A-1442-4011-8F17-19AD08C9F5D5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C825CC0A-1442-4011-8F17-19AD08C9F5D5}.Release1|Any CPU.ActiveCfg = Release1|Any CPU
+		{C825CC0A-1442-4011-8F17-19AD08C9F5D5}.Release1|Any CPU.Build.0 = Release1|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {DF4FABFE-459B-492F-9279-4A6F9B435BA5}
+	EndGlobalSection
+EndGlobal
