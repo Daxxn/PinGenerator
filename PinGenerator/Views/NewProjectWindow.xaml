@@ -1,0 +1,85 @@
+﻿<Window x:Class="PinGenerator.Views.NewProjectWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:PinGenerator.Views"
+        xmlns:models="clr-namespace:PinGenerator.Models"
+        mc:Ignorable="d"
+        Title="New Project" Height="220" Width="300">
+    <Window.Resources>
+        <Style TargetType="Border" x:Key="ItemBorder">
+            <Setter Property="Padding" Value="2,2,2,4"/>
+        </Style>
+    </Window.Resources>
+    <Grid Grid.IsSharedSizeScope="True">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0" Style="{StaticResource ItemBorder}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition SharedSizeGroup="a"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Padding="0,0,4,0">Project Name</TextBlock>
+                <TextBox Grid.Column="1" Text="{Binding Path=ProjectName}"/>
+            </Grid>
+        </Border>
+
+        <Border Grid.Row="1" Style="{StaticResource ItemBorder}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition SharedSizeGroup="a"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock>Path</TextBlock>
+                <TextBox Grid.Column="1" Text="{Binding Path=Path, UpdateSourceTrigger=PropertyChanged}"/>
+                <Button Command="{Binding Path=BrowsePathCmd}" Grid.Column="2" FontSize="11" Padding="2">Browse</Button>
+            </Grid>
+        </Border>
+
+        <Border Grid.Row="2" Style="{StaticResource ItemBorder}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition SharedSizeGroup="a"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock>Export Path</TextBlock>
+                <TextBox Grid.Column="1" Text="{Binding Path=ExportPath, UpdateSourceTrigger=PropertyChanged}"/>
+                <Button Command="{Binding Path=BrowseExpPathCmd}" Grid.Column="2" FontSize="11" Padding="2">Browse</Button>
+            </Grid>
+        </Border>
+
+        <Border Grid.Row="3" Style="{StaticResource ItemBorder}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <TextBlock Padding="0,4,0,2">MicroController</TextBlock>
+                <Button Click="OpenMicroEditor_Click" Grid.Row="1">Open Editor</Button>
+                <ComboBox
+                    Grid.Row="2"
+                    x:Name="MicrosCombo"
+                    ItemsSource="{Binding Path=MicroNames, UpdateSourceTrigger=PropertyChanged}"
+                    SelectedItem="{Binding Path=SelectedMicro, UpdateSourceTrigger=PropertyChanged}"
+                />
+            </Grid>
+        </Border>
+
+        <Button Grid.Row="5" Click="Create_Click" Command="{Binding Path=CreateProjectCmd}">Create New Project</Button>
+    </Grid>
+</Window>

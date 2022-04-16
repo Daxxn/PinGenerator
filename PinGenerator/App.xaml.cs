@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PinGenerator.Models;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
@@ -13,5 +14,15 @@ namespace PinGenerator
    /// </summary>
    public partial class App : Application
    {
+      protected override void OnStartup(StartupEventArgs e)
+      {
+         MicroController.OnStart();
+         base.OnStartup(e);
+      }
+      protected override void OnExit(ExitEventArgs e)
+      {
+         MicroController.OnExit();
+         base.OnExit(e);
+      }
    }
 }

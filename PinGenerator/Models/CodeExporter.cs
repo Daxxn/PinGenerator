@@ -10,7 +10,6 @@ namespace PinGenerator.Models
    public static class CodeExporter
    {
       #region Local Props
-
       #endregion
 
       #region Methods
@@ -19,10 +18,8 @@ namespace PinGenerator.Models
          if (!string.IsNullOrEmpty(proj.ExportPath))
          {
             StringBuilder sb = BuildHeader();
-            foreach (var comp in proj.Components)
-            {
-               BuildComponent(sb, comp);
-            }
+            BuildCompContainer(sb, proj.Micro.DigitalComponents, true);
+            BuildCompContainer(sb, proj.Micro.AnalogComponents, false);
             BuildFooter(sb);
 
             SaveFile(proj.ExportPath, sb.ToString());
@@ -49,14 +46,25 @@ namespace PinGenerator.Models
          sb.AppendLine();
       }
 
-      private static void BuildComponent(StringBuilder sb, Component comp)
+      private static void BuildCompContainer(StringBuilder sb, IEnumerable<Component> comps, bool isDigital)
       {
-         sb.AppendLine(comp.Export());
-         foreach (var pin in comp.Pins)
+         sb.AppendLine(isDigital ? "namespace D {" : "namespace A {");
+
+         foreach (var comp in comps)
          {
-            sb.AppendLine(pin.Export());
+            BuildComponent(sb, comp);
          }
          sb.AppendLine("}");
+      }
+
+      private static void BuildComponent(StringBuilder sb, Component comp)
+      {
+         sb.AppendLine($"\t{comp.Export()}");
+         foreach (var pin in comp.Pins)
+         {
+            sb.AppendLine($"\t{pin.Export()}");
+         }
+         sb.AppendLine("\t}");
       }
 
       private static void SaveFile(string path, string data)

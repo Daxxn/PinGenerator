@@ -24,20 +24,34 @@ namespace PinGenerator.Models
       #region Methods
       public static Component Create(string name, uint pinCount)
       {
-         Component microController = new()
+         Component component = new()
          {
             Name = name,
             PinCount = pinCount
          };
-         return microController;
+         return component;
       }
 
       public void AutoGenPins()
       {
-         for (uint i = 0; i < PinCount; i++)
+         if(Pins.Count == 0)
          {
-            Pin pin = new($"P{i}", i);
-            Pins.Add(pin);
+            for (uint i = 0; i < PinCount; i++)
+            {
+               Pin pin = new($"P{i}", i);
+               Pins.Add(pin);
+            }
+         }
+         else
+         {
+            if (PinCount > Pins.Count)
+            {
+               for (int i = Pins.Count; i < PinCount; i++)
+               {
+                  Pin pin = new($"P{i}", (uint)i);
+                  Pins.Add(pin);
+               }
+            }
          }
       }
 

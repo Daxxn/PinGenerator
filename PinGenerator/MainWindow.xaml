@@ -8,7 +8,7 @@
         xmlns:ext="clr-namespace:PinGenerator.Utils.Extensions"
         xmlns:enums="clr-namespace:PinGenerator.Models.Enums"
         mc:Ignorable="d"
-        Title="{Binding Path=Title}" Height="450" Width="800">
+        Title="{Binding Path=Title}" Height="600" Width="1000">
     <Window.Resources>
         <Style TargetType="Border" x:Key="ControlsBorder">
             <Setter Property="BorderBrush" Value="Blue"/>
@@ -25,12 +25,16 @@
         </Style>
 
         <conv:PinNameConverter x:Key="PinNameConverter"/>
+        <conv:NullVisibilityConverter x:Key="NullVisibilityConverter"/>
     </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="5"/>
             <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="5"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
 
         <Grid Grid.Column="0">
@@ -77,7 +81,7 @@
                             <Button Grid.Column="0" Grid.Row="3" Command="{Binding Path=SaveProjectCmd}">Save</Button>
                             <Button Grid.Column="1" Grid.Row="3" Command="{Binding Path=OpenProjectCmd}">Open</Button>
                             <Separator Grid.ColumnSpan="2" Grid.Row="4"/>
-                            <Button Grid.ColumnSpan="2" Grid.Row="5" Command="{Binding Path=NewProjectCmd}">New</Button>
+                            <Button Grid.ColumnSpan="2" Grid.Row="5" Click="NewProject_Click">New</Button>
                         </Grid>
                     </Border>
 
@@ -92,10 +96,53 @@
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
 
                             <TextBlock Style="{StaticResource ControlsTitle}">Micro</TextBlock>
-                            
+
+                            <TextBlock Grid.Column="0" Grid.Row="1">Name</TextBlock>
+                            <TextBlock Grid.Column="1" Grid.Row="1" Text="{Binding Path=Project.Micro.Name}"/>
+
+                            <Expander Header="Pins" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="2">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+
+                                    <TextBlock Padding="0,0,20,0">Digital</TextBlock>
+                                    <TextBlock Grid.Column="1" Text="{Binding Path=Project.Micro.DigitalPinCount}"/>
+                                    <TextBlock Grid.Row="1">Analog</TextBlock>
+                                    <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Path=Project.Micro.AnalogPinCount}"/>
+                                    <TextBlock Grid.Row="2">Serial</TextBlock>
+                                    <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Path=Project.Micro.Serial.Count, Mode=OneWay}"/>
+                                </Grid>
+                            </Expander>
+
+                            <Button
+                                Grid.Column="0"
+                                Grid.Row="3"
+                                Grid.ColumnSpan="2"
+                                Command="{Binding Path=ChangeMicroCmd}"
+                            >
+                                Change
+                            </Button>
+
+                            <Button
+                                Grid.Row="4"
+                                Grid.ColumnSpan="2"
+                                FontSize="10"
+                                Padding="0"
+                                Click="MicroEditor_Click"
+                            >
+                                Editor
+                            </Button>
                         </Grid>
                     </Border>
 
@@ -106,9 +153,9 @@
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
-                            
+
                             <TextBlock Grid.Row="0" Style="{StaticResource ControlsTitle}">Component</TextBlock>
-                            
+
                             <Border Grid.Row="1">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
@@ -128,7 +175,7 @@
                                     <TextBlock Grid.Row="1" Grid.Column="0">Name</TextBlock>
                                     <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Path=NewCompName, UpdateSourceTrigger=PropertyChanged}"/>
 
-                                    <TextBlock Grid.Row="2" Grid.Column="0">Pin Count</TextBlock>
+                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="{Binding Path=NewPinTitleText}"/>
                                     <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Path=NewCompPins, UpdateSourceTrigger=PropertyChanged}"/>
 
                                     <Button Grid.ColumnSpan="2" Grid.Row="3" Command="{Binding Path=NewCompCmd}">Add</Button>
@@ -151,38 +198,15 @@
 
                                     <TextBlock Grid.ColumnSpan="2" Grid.Row="0" Padding="4,0,0,0" FontSize="14">Pins</TextBlock>
 
-                                    <Button Grid.Row="1" Grid.ColumnSpan="2" Command="{Binding Path=AutoGenPinsCmd}">Auto Set Pins</Button>
+                                    <Button Grid.Row="1" Grid.ColumnSpan="2" Command="{Binding Path=GenSelectedPinsCmd}">Auto Set Pins</Button>
+
+                                    <CheckBox Grid.Row="2" Grid.ColumnSpan="2" IsChecked="{Binding Path=AutoGenPins, UpdateSourceTrigger=PropertyChanged}">Pre-Populate Pins</CheckBox>
                                 </Grid>
                             </Border>
                         </Grid>
                     </Border>
                 </Grid>
             </Border>
-
-            <ListView
-                ItemsSource="{Binding Path=Project.Components}"
-                SelectedItem="{Binding Path=SelectedComponent, UpdateSourceTrigger=PropertyChanged}"
-                Grid.Row="2"
-                HorizontalContentAlignment="Left"
-                BorderBrush="Red"
-                BorderThickness="1.5"
-            >
-                <ListView.ItemTemplate>
-                    <DataTemplate>
-                        <Border>
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-
-                                <TextBox Text="{Binding Path=Name, UpdateSourceTrigger=PropertyChanged}" Background="#eee" Margin="0,0,10,0"/>
-                                <TextBox Grid.Column="1" Width="25" Text="{Binding Path=PinCount}"/>
-                            </Grid>
-                        </Border>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
 
             <Border Grid.Row="3" Style="{StaticResource ControlsBorder}">
                 <Grid>
@@ -196,7 +220,7 @@
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
-                    <TextBlock Grid.Row="0" Style="{StaticResource ControlsTitle}">Export</TextBlock>
+                    <TextBlock Grid.Row="0" Style="{StaticResource ControlsTitle}">Write Code</TextBlock>
 
                     <TextBlock Grid.Column="0" Grid.Row="1">Path</TextBlock>
                     <TextBox Grid.Column="1" Grid.Row="1" Text="{Binding Path=Project.ExportPath}"/>
@@ -213,21 +237,233 @@
             ResizeDirection="Columns"
         />
 
+        <Border Grid.Column="2">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <TabControl Grid.Column="2" SelectedIndex="{Binding Path=CurrentPinType}">
+                    <TabItem Header="Digital">
+                        <ListView
+                            ItemsSource="{Binding Path=Project.Micro.DigitalComponents}"
+                            SelectedItem="{Binding Path=SelectedComponent, UpdateSourceTrigger=PropertyChanged}"
+                            HorizontalContentAlignment="Left"
+                        >
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <Border>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <TextBox Text="{Binding Path=Name, UpdateSourceTrigger=PropertyChanged}" Background="#eee" Margin="0,0,10,0"/>
+                                            <TextBox Grid.Column="1" Width="25" Text="{Binding Path=PinCount, UpdateSourceTrigger=LostFocus}" TextChanged="TextBox_TextChanged"/>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                    </TabItem>
+                    <TabItem Header="Analog">
+                        <ListView
+                            ItemsSource="{Binding Path=Project.Micro.AnalogComponents}"
+                            SelectedItem="{Binding Path=SelectedComponent, UpdateSourceTrigger=PropertyChanged}"
+                            HorizontalContentAlignment="Left"
+                            SelectionChanged="Component_SelectionChanged"
+                        >
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <Border>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <TextBox Text="{Binding Path=Name, UpdateSourceTrigger=PropertyChanged}" Background="#eee" Margin="0,0,10,0"/>
+                                            <TextBox Grid.Column="1" Width="25" Text="{Binding Path=PinCount, UpdateSourceTrigger=LostFocus}" TextChanged="TextBox_TextChanged"/>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                    </TabItem>
+                    <TabItem Header="Serial">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <ListView
+                                Grid.Row="0"
+                                ItemsSource="{Binding Path=Project.Micro.Serial}"
+                                SelectedItem="{Binding Path=SelectedSerial, UpdateSourceTrigger=PropertyChanged}"
+                                HorizontalContentAlignment="Stretch"
+                            >
+                                <ListView.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border HorizontalAlignment="Stretch">
+                                            <TextBlock Padding="2" HorizontalAlignment="Stretch" Text="{Binding Path=Name, UpdateSourceTrigger=PropertyChanged}" Background="#eee" Margin="0,0,10,0"/>
+                                        </Border>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                            </ListView>
+                            
+                            <Expander
+                                x:Name="SerialExpander"
+                                Header="Serial"
+                                Grid.Row="1"
+                                ExpandDirection="Up"
+                                IsExpanded="{Binding Path=ExpandSerialComponents}"
+                            >
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+                                        <TextBlock Grid.Column="0" Grid.Row="0">Name</TextBlock>
+                                        <TextBox Grid.Column="1" Grid.Row="0" Text="{Binding Path=SelectedSerial.Name}"/>
+                                    </Grid>
+
+                                    <Grid Grid.Row="1">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="*"/>
+                                        </Grid.RowDefinitions>
+                                        <TextBlock>Pins</TextBlock>
+                                        <ListView Grid.Row="1" ItemsSource="{Binding Path=SelectedSerial.Pins}">
+                                            <ListView.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Border>
+                                                        <Grid>
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="Auto"/>
+                                                                <ColumnDefinition Width="*"/>
+                                                                <ColumnDefinition Width="Auto"/>
+                                                                <ColumnDefinition Width="*"/>
+                                                            </Grid.ColumnDefinitions>
+
+                                                            <TextBlock>Name</TextBlock>
+                                                            <TextBox Grid.Column="1" Text="{Binding Path=Name}"/>
+                                                            <TextBlock Grid.Column="2">Pin #</TextBlock>
+                                                            <TextBox Grid.Column="3" Text="{Binding Path=PinNumber}"/>
+                                                        </Grid>
+                                                    </Border>
+                                                </DataTemplate>
+                                            </ListView.ItemTemplate>
+                                        </ListView>
+                                    </Grid>
+
+                                    <Grid Grid.Row="2">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="*"/>
+                                        </Grid.RowDefinitions>
+                                        <TextBlock>Components</TextBlock>
+                                        <ListView Grid.Row="1" ItemsSource="{Binding Path=SelectedSerial.Components}">
+                                            <ListView.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Border>
+                                                        <Grid>
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="Auto"/>
+                                                                <ColumnDefinition Width="*"/>
+                                                                <ColumnDefinition Width="Auto"/>
+                                                            </Grid.ColumnDefinitions>
+
+                                                            <TextBlock>Name</TextBlock>
+                                                            <TextBox Grid.Column="1" Text="{Binding Path=Name}"/>
+                                                            <Border
+                                                                Grid.Column="2"
+                                                                Visibility="{Binding Path=Address, Converter={StaticResource NullVisibilityConverter}}"
+                                                            >
+                                                                <Grid>
+                                                                    <Grid.ColumnDefinitions>
+                                                                        <ColumnDefinition Width="Auto"/>
+                                                                        <ColumnDefinition Width="*"/>
+                                                                    </Grid.ColumnDefinitions>
+
+                                                                    <TextBlock>Address</TextBlock>
+                                                                    <TextBox Grid.Column="1" Text="{Binding Path=Address}"/>
+                                                                </Grid>
+                                                            </Border>
+                                                            <Border
+                                                                Grid.Column="2"
+                                                                Visibility="{Binding
+                                                                    Path=Address,
+                                                                    Converter={StaticResource NullVisibilityConverter},
+                                                                    ConverterParameter=1
+                                                                }"
+                                                            >
+                                                                <Grid>
+                                                                    <Grid.ColumnDefinitions>
+                                                                        <ColumnDefinition Width="Auto"/>
+                                                                        <ColumnDefinition Width="*"/>
+                                                                    </Grid.ColumnDefinitions>
+                                                                    <Grid.RowDefinitions>
+                                                                        <RowDefinition Height="Auto"/>
+                                                                        <RowDefinition Height="Auto"/>
+                                                                    </Grid.RowDefinitions>
+                                                                    <TextBlock>Select Pin</TextBlock>
+                                                                    <TextBox Grid.Column="1" Text="{Binding Path=SelectPin.Name}"/>
+
+                                                                    <TextBlock Grid.Row="1">Pin Number</TextBlock>
+                                                                    <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Path=PinNumber}"/>
+                                                                </Grid>
+                                                            </Border>
+                                                        </Grid>
+                                                    </Border>
+                                                </DataTemplate>
+                                            </ListView.ItemTemplate>
+                                        </ListView>
+                                    </Grid>
+                                </Grid>
+                            </Expander>
+                        </Grid>
+                    </TabItem>
+                </TabControl>
+            </Grid>
+        </Border>
+
+        <GridSplitter
+            Grid.Column="3"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch"
+            ResizeDirection="Columns"
+        />
+
         <DataGrid
-            Grid.Column="2"
+            Grid.Column="4"
             ItemsSource="{Binding Path=SelectedComponent.Pins}"
             SelectedItem="{Binding Path=SelectedPin}"
             AutoGenerateColumns="False"
+            CanUserAddRows="False"
         >
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Pin" Binding="{Binding Path=PinNumber}"/>
-                <!--<DataGridTextColumn Header="Name" Binding="{Binding Path=Name, Converter={StaticResource PinNameConverter}}"/>-->
-                <DataGridTextColumn Header="Name" Binding="{Binding Path=Name}"/>
+                <DataGridTextColumn Header="Name" Binding="{Binding Path=Name, UpdateSourceTrigger=PropertyChanged}"/>
                 <DataGridComboBoxColumn
+                    Header="Pin Type"
                     ItemsSource="{Binding Source={ext:EnumBindingSource {x:Type enums:PinType}}}"
                     SelectedItemBinding="{Binding Path=PinType}"
                 />
             </DataGrid.Columns>
         </DataGrid>
+
+        
     </Grid>
 </Window>

@@ -14,7 +14,8 @@ namespace PinGenerator.Models
       private string _name = "Empty Project";
       private string? _path = null;
       private string? _exportPath = null;
-      private ObservableCollection<Component> _comps = new();
+      //private ObservableCollection<Component> _comps = new();
+      private MicroController _micro = new();
       #endregion
 
       #region Constructors
@@ -22,9 +23,24 @@ namespace PinGenerator.Models
       #endregion
 
       #region Methods
-      public void NewComponent(string name, uint pinCount)
+      public static Project Create(string name, string path, MicroController micro)
       {
-         Components.Add(Component.Create(name, pinCount));
+         return new()
+         {
+            Name = name,
+            Path = path,
+            Micro = micro,
+         };
+      }
+      public static Project Create(string name, string path, string exportPath, MicroController micro)
+      {
+         return new()
+         {
+            Name = name,
+            Path = path,
+            Micro = micro,
+            ExportPath = exportPath,
+         };
       }
       #endregion
 
@@ -59,12 +75,22 @@ namespace PinGenerator.Models
          }
       }
 
-      public ObservableCollection<Component> Components
+      //public ObservableCollection<Component> Components
+      //{
+      //   get => _comps;
+      //   set
+      //   {
+      //      _comps = value;
+      //      OnPropertyChanged();
+      //   }
+      //}
+
+      public MicroController Micro
       {
-         get => _comps;
+         get => _micro;
          set
          {
-            _comps = value;
+            _micro = value;
             OnPropertyChanged();
          }
       }

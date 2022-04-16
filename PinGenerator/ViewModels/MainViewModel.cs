@@ -10,27 +10,34 @@ using System.Threading.Tasks;
 using System.Windows;
 using Microsoft.Win32;
 using System.IO;
+using PinGenerator.Models.Events;
 
 namespace PinGenerator.ViewModels
 {
    public class MainViewModel : ViewModel
    {
       #region Local Props
+      public event EventHandler<bool> ExpandEvent = null;
+      public static event EventHandler<bool> IsSaveChanged;
+
       private Project _proj = new();
       private Component? _selectedComp = null;
       private Pin? _selectedPin = null;
+      private Serial? _selectedSerial = null;
 
       private string? _newCompName = null;
       private uint? _newCompPins = null;
 
-      private bool _isSaved = false;
+      private bool _isSaved = true;
+
+      private int _currentPinType = 0;
+      private bool _autoGenPins = true;
 
       #region Commands
-      public Command NewProjectCmd { get; init; }
       public Command OpenProjectCmd { get; init; }
       public Command SaveProjectCmd { get; init; }
       public Command NewCompCmd { get; init; }
-      public Command AutoGenPinsCmd { get; init; }
+      public Command GenSelectedPinsCmd { get; init; }
       public Command BrowseExportCmd { get; init; }
       public Command ExportCmd { get; init; }
       #endregion
@@ -40,63 +47,100 @@ namespace PinGenerator.ViewModels
       public MainViewModel()
       {
          #region Test Models
-         Project = new()
-         {
-            Name = "Project Test",
-            Components = new()
-            {
-               Component.Create("Test 1", 16),
-               Component.Create("Test 2", 8),
-               Component.Create("Test 1", 32),
-            }
-         };
+         //Project = new()
+         //{
+         //   Name = "Project Test",
+         //   Micro = new()
+         //   {
+         //      DigitalPinCount = 16,
+         //      AnalogPinCount = 8,
+         //      DigitalComponents = new()
+         //      {
+         //         new() { Name = "Test 1", PinCount = 8},
+         //         new() { Name = "Test 2", PinCount = 4}
+         //      },
+         //      AnalogComponents = new()
+         //      {
+         //         new() { Name = "Test 3", PinCount = 7 },
+         //         new() { Name = "Test 4", PinCount = 16 },
+         //      },
+         //      Serial = new()
+         //      {
+         //         new() {
+         //            Name = "I2C",
+         //            Pins = new() { new() { Name = "I2C_SCLK", PinNumber = 8, }, new() { Name = "I2C_SDA", PinNumber = 9 } },
+         //            Components  = new()
+         //            {
+         //               new() { Name = "IO Expander", Address = 42 },
+         //               new() { Name = "RTC", Address = 24 }
+         //            }
+         //         },
+         //         new()
+         //         {
+         //            Name = "SPI",
+         //            Pins = new() { new() { Name = "SPI_SCLK", PinNumber=10}, new() { Name ="SPI_MOSI", PinNumber=11}, new() { Name ="SPI_MISO", PinNumber=12} },
+         //            Components = new()
+         //            {
+         //               new() { Name="Temp Sensor", SelectPin = new() { Name ="THERMO_CS", PinNumber=13} }
+         //            }
+         //         }
+         //      }
+         //   }
+         //};
          #endregion
 
          #region Commands Init
-         NewProjectCmd   = new(NewProject);
          OpenProjectCmd  = new(OpenProject);
          SaveProjectCmd  = new(SaveProject);
-         AutoGenPinsCmd  = new(AutoGenPins);
+         GenSelectedPinsCmd = new(GeneratePins);
          NewCompCmd      = new(NewComponent);
          BrowseExportCmd = new(BrowseExport);
          ExportCmd       = new(ExportCode);
          #endregion
+
+         #region Event Init
+         IsSaveChanged += MainViewModel_IsSaveChanged;
+         #endregion
+      }
+
+      private void MainViewModel_IsSaveChanged(object? sender, bool saved)
+      {
+         IsSaved = saved;
       }
       #endregion
 
       #region Methods
-      private void NewProject()
+      public void NewProject(Project proj)
       {
-         if (IsSaved)
+         if (proj is null)
          {
-            Project = new();
-            SelectedComponent = null;
-            SelectedPin = null;
-            IsSaved = false;
+            MessageBox.Show("Project not created...", "Error");
+            return;
          }
-         else
-         {
-            if (MessageBox.Show("Project is NOT saved.\nContinue?", "Warning", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
-            {
-               Project = new();
-               SelectedComponent = null;
-               SelectedPin = null;
-               IsSaved = false;
-            }
-         }
+         Project = proj;
+         IsSaved = false;
       }
 
       private void SaveProject()
       {
          try
          {
+            if (Project.Name == "Empty Project")
+            {
+               if (Project.Micro.AnalogComponents.Count == 0 && Project.Micro.DigitalComponents.Count == 0)
+               {
+                  MessageBox.Show("Project is empty. Create a new project to save it.");
+                  return;
+               }
+            }
             if (Project.Path is null)
             {
                SaveFileDialog dialog = new()
                {
                   Title = "Save Project",
                   DefaultExt = ".pin",
-                  Filter = "*.pin|Pin File|*.*|All Files"
+                  Filter = "*.pin|Pin File|*.*|All Files",
+                  CustomPlaces = Const.CustomProjectDirs,
                };
 
                if (dialog.ShowDialog() == true)
@@ -104,8 +148,13 @@ namespace PinGenerator.ViewModels
                   Project.Path = dialog.FileName;
                   Project.Name = Path.GetFileNameWithoutExtension(dialog.FileName);
                }
+               else
+               {
+                  return;
+               }
             }
             JsonReader.SaveJsonFile(Project.Path, Project, true);
+            IsSaved = true;
          }
          catch (Exception e)
          {
@@ -123,12 +172,21 @@ namespace PinGenerator.ViewModels
                {
                   Title = "Open Project",
                   Filter = "*.pin|Pin File|*.*|All Files",
-                  InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+                  InitialDirectory = Const.CustomProjectDirs[0].Path,
+                  CustomPlaces = Const.CustomProjectDirs,
                };
 
                if (dialog.ShowDialog() == true)
                {
                   Project = JsonReader.OpenJsonFile<Project>(dialog.FileName);
+               }
+            }
+            else
+            {
+               if (MessageBox.Show("Project is NOT saved.\nContinue?", "Warning", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+               {
+                  IsSaved = true;
+                  OpenProject();
                }
             }
          }
@@ -142,14 +200,55 @@ namespace PinGenerator.ViewModels
       {
          if (NewCompName != null && NewCompPins != null)
          {
-            Project.NewComponent(NewCompName, (uint)NewCompPins);
+            if (CurrentPinType == 2)
+            {
+               if (SelectedSerial is null) return;
+               SelectedSerial.NewComponent(NewCompName, (int)NewCompPins);
+               IsSaved = false;
+               return;
+            }
+            var newComp = Project.Micro.NewComponent(NewCompName, (uint)NewCompPins, CurrentPinType);
+            SelectedComponent = newComp;
+            if (AutoGenPins)
+            {
+               GeneratePins();
+            }
+            IsSaved = false;
          }
       }
 
-      private void AutoGenPins()
+      public void UpdateComponent(Component comp, uint count)
+      {
+         if (comp is null) return;
+
+         comp.PinCount = count;
+         comp.AutoGenPins();
+
+         if (CurrentPinType == 0)
+         {
+            if (Project.Micro.DigitalComponents.Contains(comp))
+            {
+               var c = Project.Micro.DigitalComponents.First(c => c.ID == comp.ID);
+               c = comp;
+            }
+         }
+         else if (CurrentPinType == 1)
+         {
+            if (Project.Micro.AnalogComponents.Contains(comp))
+            {
+               var c = Project.Micro.AnalogComponents.First(c => c.ID == comp.ID);
+               c = comp;
+            }
+         }
+
+         IsSaved = false;
+      }
+
+      private void GeneratePins()
       {
          if (SelectedComponent is null) return;
          SelectedComponent.AutoGenPins();
+         IsSaved = false;
       }
 
       private void BrowseExport()
@@ -160,11 +259,8 @@ namespace PinGenerator.ViewModels
             Title = "Export Path",
             AddExtension = true,
             DefaultExt = ".h",
-            CustomPlaces = new List<FileDialogCustomPlace>()
-            {
-               new(@"C:\Users\Daxxn\Code\Arduino"),
-               new(@"C:\Users\Daxxn\Code\Arduino\Projects")
-            }
+            Filter = "*.h|Header File|*.*|Any File",
+            CustomPlaces = Const.CustomExportDirs,
          };
 
          if (dialog.ShowDialog() == true)
@@ -185,7 +281,7 @@ namespace PinGenerator.ViewModels
       {
          get
          {
-            return $"Pin Generator : {Project?.Name}";
+            return $"Pin Generator : {Project?.Name}{(!IsSaved ? "*" : "")}";
          }
       }
 
@@ -219,12 +315,53 @@ namespace PinGenerator.ViewModels
          }
       }
 
+      public Serial? SelectedSerial
+      {
+         get => _selectedSerial;
+         set
+         {
+            _selectedSerial = value;
+            ExpandEvent?.Invoke(this, value is not null);
+            OnPropertyChanged();
+         }
+      }
+
+      public int CurrentPinType
+      {
+         get => _currentPinType;
+         set
+         {
+            _currentPinType = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(NewPinTitleText));
+         }
+      }
+
+      public string NewPinTitleText
+      {
+         get
+         {
+            if (CurrentPinType == 2) return "Address Pin";
+            else return "Pin Count";
+         }
+      }
+
       public bool IsSaved
       {
          get => _isSaved;
          set
          {
             _isSaved = value;
+            OnPropertyChanged();
+         }
+      }
+
+      public bool AutoGenPins
+      {
+         get => _autoGenPins;
+         set
+         {
+            _autoGenPins = value;
             OnPropertyChanged();
          }
       }

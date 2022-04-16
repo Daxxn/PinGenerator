@@ -5,8 +5,174 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PinGenerator.Views"
         mc:Ignorable="d"
-        Title="MicroEditor" Height="450" Width="800">
+        Title="MicroController Editor" Height="450" Width="400">
     <Grid>
-        
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <Border Grid.Column="0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <Border Grid.Row="0">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <Button
+                            Grid.Row="0"
+                            Command="{Binding Path=NewMicroCmd}"
+                        >
+                            New
+                        </Button>
+                        <Button
+                            Grid.Row="1"
+                            Command="{Binding Path=RemoveMicroCmd}"
+                        >
+                            Remove
+                        </Button>
+                    </Grid>
+                </Border>
+
+                <Button Grid.Row="3" FontSize="14" Click="Close_Click" Command="{Binding Path=SaveMicrosCmd}">Save</Button>
+            </Grid>
+        </Border>
+
+        <ListView
+            Grid.Column="1"
+            ItemsSource="{Binding Path=Micros}"
+            SelectedItem="{Binding Path=SelectedMicro}"
+            HorizontalContentAlignment="Stretch"
+        >
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <Border>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" MinWidth="100"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock>Name</TextBlock>
+                            <TextBox Grid.Column="1" Text="{Binding Path=Name, UpdateSourceTrigger=PropertyChanged}"/>
+                            <TextBlock Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1">Pin Counts</TextBlock>
+                            <TextBlock Grid.Row="2">Digital</TextBlock>
+                            <TextBox
+                                Grid.Column="1"
+                                Grid.Row="2"
+                                Text="{Binding Path=DigitalPinCount, UpdateSourceTrigger=PropertyChanged}"
+                            />
+                            <TextBlock Grid.Row="3">Analog</TextBlock>
+                            <TextBox
+                                Grid.Column="1"
+                                Grid.Row="3"
+                                Text="{Binding Path=AnalogPinCount, UpdateSourceTrigger=PropertyChanged}"
+                            />
+                            <Expander Header="Serial" Grid.Row="4" Grid.ColumnSpan="2">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Button Click="AddSerial_Click">+</Button>
+                                        <Button Click="RemSerial_Click">-</Button>
+                                    </StackPanel>
+                                    <ListView
+                                        Grid.Row="1"
+                                        ItemsSource="{Binding Path=Serial}"
+                                        SelectionChanged="Serial_Selected"
+                                        HorizontalContentAlignment="Stretch"
+                                    >
+                                        <ListView.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border>
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                            <ColumnDefinition Width="*"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition Height="Auto"/>
+                                                            <RowDefinition Height="Auto"/>
+                                                        </Grid.RowDefinitions>
+
+                                                        <TextBlock>Name</TextBlock>
+                                                        <TextBox
+                                                            Grid.Column="1"
+                                                            Text="{Binding Path=Name, UpdateSourceTrigger=PropertyChanged}"
+                                                        />
+
+                                                        <Expander Header="Pins" Grid.ColumnSpan="2" Grid.Row="1">
+                                                            <Grid>
+                                                                <Grid.RowDefinitions>
+                                                                    <RowDefinition Height="Auto"/>
+                                                                    <RowDefinition Height="*"/>
+                                                                </Grid.RowDefinitions>
+                                                                <StackPanel Orientation="Horizontal">
+                                                                    <Button Click="AddSerialPin_Click">+</Button>
+                                                                    <Button Click="RemSerialPin_Click">-</Button>
+                                                                </StackPanel>
+                                                                <ListView
+                                                                    Grid.Row="1"
+                                                                    ItemsSource="{Binding Path=Pins}"
+                                                                    SelectedItem="{Binding Path=SelectedPin, UpdateSourceTrigger=PropertyChanged}"
+                                                                    HorizontalContentAlignment="Stretch"
+                                                                >
+                                                                    <ListView.ItemTemplate>
+                                                                        <DataTemplate>
+                                                                            <Border>
+                                                                                <Grid>
+                                                                                    <Grid.ColumnDefinitions>
+                                                                                        <ColumnDefinition Width="Auto"/>
+                                                                                        <ColumnDefinition Width="Auto"/>
+                                                                                    </Grid.ColumnDefinitions>
+
+                                                                                    <TextBox
+                                                                                        Grid.Column="0"
+                                                                                        MinWidth="50"
+                                                                                        Padding="0,0,10,0"
+                                                                                        Text="{Binding Path=Name, UpdateSourceTrigger=PropertyChanged}"
+                                                                                    />
+                                                                                    <TextBox
+                                                                                        Grid.Column="1"
+                                                                                        MinWidth="50"
+                                                                                        Text="{Binding Path=PinNumber, UpdateSourceTrigger=PropertyChanged}"
+                                                                                    />
+                                                                                </Grid>
+                                                                            </Border>
+                                                                        </DataTemplate>
+                                                                    </ListView.ItemTemplate>
+                                                                </ListView>
+                                                            </Grid>
+                                                        </Expander>
+                                                    </Grid>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ListView.ItemTemplate>
+                                    </ListView>
+                                </Grid>
+                            </Expander>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
     </Grid>
 </Window>
