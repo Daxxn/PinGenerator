@@ -126,15 +126,6 @@
                             </Expander>
 
                             <Button
-                                Grid.Column="0"
-                                Grid.Row="3"
-                                Grid.ColumnSpan="2"
-                                Command="{Binding Path=ChangeMicroCmd}"
-                            >
-                                Change
-                            </Button>
-
-                            <Button
                                 Grid.Row="4"
                                 Grid.ColumnSpan="2"
                                 FontSize="10"
@@ -247,7 +238,7 @@
                     <TabItem Header="Digital">
                         <ListView
                             ItemsSource="{Binding Path=Project.Micro.DigitalComponents}"
-                            SelectedItem="{Binding Path=SelectedComponent, UpdateSourceTrigger=PropertyChanged}"
+                            SelectedItem="{Binding Path=SelectedDigitalComponent, UpdateSourceTrigger=PropertyChanged}"
                             HorizontalContentAlignment="Left"
                         >
                             <ListView.ItemTemplate>
@@ -270,7 +261,7 @@
                     <TabItem Header="Analog">
                         <ListView
                             ItemsSource="{Binding Path=Project.Micro.AnalogComponents}"
-                            SelectedItem="{Binding Path=SelectedComponent, UpdateSourceTrigger=PropertyChanged}"
+                            SelectedItem="{Binding Path=SelectedAnalogComponent, UpdateSourceTrigger=PropertyChanged}"
                             HorizontalContentAlignment="Left"
                             SelectionChanged="Component_SelectionChanged"
                         >

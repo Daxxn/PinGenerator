@@ -22,6 +22,8 @@ namespace PinGenerator.ViewModels
 
       private Project _proj = new();
       private Component? _selectedComp = null;
+      private Component? _selectedDigitalComp = null;
+      private Component? _selectedAnalogComp = null;
       private Pin? _selectedPin = null;
       private Serial? _selectedSerial = null;
 
@@ -139,7 +141,7 @@ namespace PinGenerator.ViewModels
                {
                   Title = "Save Project",
                   DefaultExt = ".pin",
-                  Filter = "*.pin|Pin File|*.*|All Files",
+                  Filter = Const.FileFilters,
                   CustomPlaces = Const.CustomProjectDirs,
                };
 
@@ -171,7 +173,7 @@ namespace PinGenerator.ViewModels
                OpenFileDialog dialog = new()
                {
                   Title = "Open Project",
-                  Filter = "*.pin|Pin File|*.*|All Files",
+                  Filter = Const.FileFilters,
                   InitialDirectory = Const.CustomProjectDirs[0].Path,
                   CustomPlaces = Const.CustomProjectDirs,
                };
@@ -209,6 +211,14 @@ namespace PinGenerator.ViewModels
             }
             var newComp = Project.Micro.NewComponent(NewCompName, (uint)NewCompPins, CurrentPinType);
             SelectedComponent = newComp;
+            if (CurrentPinType == 0)
+            {
+               SelectedDigitalComponent = newComp;
+            }
+            else if (CurrentPinType == 1)
+            {
+               SelectedAnalogComponent = newComp;
+            }
             if (AutoGenPins)
             {
                GeneratePins();
@@ -255,11 +265,11 @@ namespace PinGenerator.ViewModels
       {
          SaveFileDialog dialog = new()
          {
-            FileName = Project.ExportPath,
+            FileName = string.IsNullOrEmpty(Project.ExportPath) ? $"{Project.Name}Pinout.h" : Project.ExportPath,
             Title = "Export Path",
             AddExtension = true,
             DefaultExt = ".h",
-            Filter = "*.h|Header File|*.*|Any File",
+            Filter = Const.HeaderFilters,
             CustomPlaces = Const.CustomExportDirs,
          };
 
@@ -305,6 +315,34 @@ namespace PinGenerator.ViewModels
          }
       }
 
+      public Component? SelectedDigitalComponent
+      {
+         get => _selectedDigitalComp;
+         set
+         {
+            _selectedDigitalComp = value;
+            if (CurrentPinType == 0)
+            {
+               SelectedComponent = value;
+            }
+            OnPropertyChanged();
+         }
+      }
+
+      public Component? SelectedAnalogComponent
+      {
+         get => _selectedAnalogComp;
+         set
+         {
+            _selectedAnalogComp = value;
+            if (CurrentPinType == 1)
+            {
+               SelectedComponent = value;
+            }
+            OnPropertyChanged();
+         }
+      }
+
       public Pin? SelectedPin
       {
          get => _selectedPin;
@@ -332,8 +370,17 @@ namespace PinGenerator.ViewModels
          set
          {
             _currentPinType = value;
+            if (value == 0)
+            {
+               SelectedComponent = SelectedDigitalComponent;
+            }
+            else if (value == 1)
+            {
+               SelectedComponent = SelectedAnalogComponent;
+            }
             OnPropertyChanged();
             OnPropertyChanged(nameof(NewPinTitleText));
+            OnPropertyChanged(nameof(SelectedComponent));
          }
       }
 

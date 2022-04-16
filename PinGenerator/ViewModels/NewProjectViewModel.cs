@@ -50,7 +50,7 @@ namespace PinGenerator.ViewModels
 
          if (micro is null) return;
 
-         createdDelegate(Project.Create(ProjectName, Path, micro));
+         createdDelegate(Project.Create(ProjectName, Path, ExportPath, micro));
       }
 
       private void BrowsePath()
@@ -59,7 +59,7 @@ namespace PinGenerator.ViewModels
          {
             AddExtension = true,
             DefaultExt = ".pin",
-            Filter = "*.pin|Pin Gen Project File|*.*|All Files",
+            Filter = Const.FileFilters,
             Title = "Select Project Save File",
             FileName = ProjectName,
             CustomPlaces = Const.CustomProjectDirs
@@ -77,7 +77,7 @@ namespace PinGenerator.ViewModels
          {
             AddExtension = true,
             DefaultExt = ".h",
-            Filter = "*.h|Header File|*.*|All Files",
+            Filter = Const.HeaderFilters,
             Title = "Select Project Save File",
             FileName = $"{ProjectName}Pinout.h",
             CustomPlaces = Const.CustomExportDirs

@@ -19,5 +19,8 @@ namespace PinGenerator.Models
          new($@"{Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)}\Code\Arduino"),
          new($@"{Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)}\Code\C++")
       };
+
+      public static readonly string FileFilters = "Pin File|*.pin|All Files|*.*";
+      public static readonly string HeaderFilters = "Header File|*.h|All Files|*.*";
    }
 }

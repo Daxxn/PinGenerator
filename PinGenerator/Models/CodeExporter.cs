@@ -40,7 +40,7 @@ namespace PinGenerator.Models
       private static void BuildFooter(StringBuilder sb)
       {
          sb.AppendLine();
-         sb.AppendLine($"Author: Daxxn");
+         sb.AppendLine("// Author: Daxxn");
          sb.AppendLine("// Auto-Generated code file from PinGenerator.");
          sb.AppendLine("// Avoid editing this file.");
          sb.AppendLine();
