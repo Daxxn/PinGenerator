@@ -20,13 +20,14 @@
         <Style TargetType="TextBlock" x:Key="ControlsTitle">
             <Setter Property="FontSize" Value="13"/>
             <Setter Property="FontWeight" Value="DemiBold"/>
-            <Setter Property="Grid.ColumnSpan" Value="2"/>
+            <Setter Property="Grid.ColumnSpan" Value="4"/>
             <Setter Property="HorizontalAlignment" Value="Center"/>
         </Style>
 
         <conv:PinNameConverter x:Key="PinNameConverter"/>
         <conv:NullVisibilityConverter x:Key="NullVisibilityConverter"/>
         <conv:CurrentPinTypeConverter x:Key="CurrentPinTypeConverter"/>
+        <conv:BoolColorConverter x:Key="BoolColorConverter"/>
     </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
@@ -77,7 +78,7 @@
                             <TextBox Grid.Row="1" Grid.Column="1" MinWidth="50" MaxWidth="200" Text="{Binding Path=Project.Name}"/>
 
                             <TextBlock Grid.Row="2" Grid.Column="0">Path</TextBlock>
-                            <TextBlock Grid.Row="2" Grid.Column="1" MaxWidth="200" Text="{Binding Path=Project.Path}"/>
+                            <TextBlock Grid.Row="2" Grid.Column="1" MaxWidth="150" Text="{Binding Path=Project.Path}"/>
 
                             <Button Grid.Column="0" Grid.Row="3" Command="{Binding Path=SaveProjectCmd}">Save</Button>
                             <Button Grid.Column="1" Grid.Row="3" Command="{Binding Path=OpenProjectCmd}">Open</Button>
@@ -216,19 +217,69 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
-                    <TextBlock Grid.Row="0" Style="{StaticResource ControlsTitle}">Write Code</TextBlock>
+                    <TextBlock Grid.Row="0" Style="{StaticResource ControlsTitle}">Export</TextBlock>
 
-                    <TextBlock Grid.Column="0" Grid.Row="1">Path</TextBlock>
-                    <TextBox Grid.Column="1" Grid.Row="1" Text="{Binding Path=Project.ExportPath}"/>
-                    <Button Grid.Column="0" Grid.Row="2" Command="{Binding Path=BrowseExportCmd}">Browse</Button>
-                    <Button Grid.Column="1" Grid.Row="2" Command="{Binding Path=ExportCmd}">Export</Button>
+                    <TextBlock Grid.Column="0" Grid.Row="1">Code Path</TextBlock>
+                    <TextBox Grid.Column="1" Grid.Row="1" MaxWidth="100" Text="{Binding Path=Project.ExportCodePath}"/>
+                    <Button Grid.Column="2" Grid.Row="1" Command="{Binding Path=BrowseExportCodeCmd}">Browse</Button>
+                    
+                    <TextBlock Grid.Column="0" Grid.Row="2">Doc Path</TextBlock>
+                    <TextBox Grid.Column="1" Grid.Row="2" MaxWidth="100" Text="{Binding Path=Project.ExportDocPath}"/>
+                    <Button Grid.Column="2" Grid.Row="2" Command="{Binding Path=BrowseExportDocCmd}">Browse</Button>
+                    
+                    <Button Grid.Column="0" Grid.Row="3" Command="{Binding Path=ExportCodeCmd}">Export Code</Button>
+                    <Button Grid.Column="1" Grid.Row="3" Command="{Binding Path=ExportDocCmd}">Export Doc</Button>
+                    <Button Grid.Column="2" Grid.Row="3" Command="{Binding Path=ExportCmd}">Export</Button>
+
+                    <TextBlock Grid.ColumnSpan="4" Grid.Row="4" HorizontalAlignment="Center">Export Status</TextBlock>
+                    <Grid
+                        Grid.Column="0"
+                        Grid.ColumnSpan="4"
+                        Grid.Row="5"
+                    >
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" HorizontalAlignment="Right" Padding="2">Doc</TextBlock>
+                        <Ellipse
+                            Grid.Column="1"
+                            Width="20" Height="20"
+                            Fill="{Binding
+                                Path=IsDocExported,
+                                Converter={StaticResource BoolColorConverter},
+                                UpdateSourceTrigger=PropertyChanged,
+                                FallbackValue=Cyan
+                            }"
+                            Margin="2"
+                        />
+                        <Ellipse
+                            Grid.Column="2"
+                            Width="20" Height="20"
+                            Fill="{Binding
+                                Path=IsCodeExported,
+                                Converter={StaticResource BoolColorConverter},
+                                UpdateSourceTrigger=PropertyChanged,
+                                FallbackValue=Blue
+                            }"
+                            Margin="2"
+                        />
+                        <TextBlock Grid.Column="3" Grid.Row="5" HorizontalAlignment="Left" Padding="2">Code</TextBlock>
+                    </Grid>
                 </Grid>
             </Border>
         </Grid>

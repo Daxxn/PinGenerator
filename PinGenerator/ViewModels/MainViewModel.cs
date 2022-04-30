@@ -35,6 +35,9 @@ namespace PinGenerator.ViewModels
 
       private bool _isSaved = true;
 
+      private bool? _isCodeExported = null;
+      private bool? _isDocExported = null;
+
       private int _currentPinType = 0;
       private bool _autoGenPins = true;
 
@@ -44,8 +47,11 @@ namespace PinGenerator.ViewModels
       public Command NewCompCmd { get; init; }
       public Command RemCompCmd { get; init; }
       public Command GenSelectedPinsCmd { get; init; }
-      public Command BrowseExportCmd { get; init; }
+      public Command BrowseExportCodeCmd { get; init; }
+      public Command BrowseExportDocCmd { get; init; }
       public Command ExportCmd { get; init; }
+      public Command ExportCodeCmd { get; init; }
+      public Command ExportDocCmd { get; init; }
       #endregion
       #endregion
 
@@ -53,13 +59,17 @@ namespace PinGenerator.ViewModels
       public MainViewModel()
       {
          #region Commands Init
-         OpenProjectCmd     = new(OpenProject);
-         SaveProjectCmd     = new(SaveProject);
-         GenSelectedPinsCmd = new(GeneratePins);
-         NewCompCmd         = new(NewComponent);
-         RemCompCmd         = new(RemComp);
-         BrowseExportCmd    = new(BrowseExport);
-         ExportCmd          = new(ExportCode);
+         OpenProjectCmd      = new(OpenProject);
+         SaveProjectCmd      = new(SaveProject);
+         GenSelectedPinsCmd  = new(GeneratePins);
+         NewCompCmd          = new(NewComponent);
+         RemCompCmd          = new(RemComp);
+         BrowseExportCodeCmd = new(BrowseExportCode);
+         BrowseExportDocCmd  = new(BrowseExportDoc);
+         ExportCmd           = new(Export);
+         ExportCodeCmd       = new(ExportCode);
+         ExportDocCmd        = new(ExportDoc);
+
          #endregion
 
          #region Events Init
@@ -256,12 +266,12 @@ namespace PinGenerator.ViewModels
          IsSaved = false;
       }
 
-      private void BrowseExport()
+      private void BrowseExportCode()
       {
          SaveFileDialog dialog = new()
          {
-            FileName = string.IsNullOrEmpty(Project.ExportPath) ? $"{Project.Name}Pinout.h" : Project.ExportPath,
-            Title = "Export Path",
+            FileName = string.IsNullOrEmpty(Project.ExportCodePath) ? $"{Project.Name}Pinout.h" : Project.ExportCodePath,
+            Title = "Code Export Path",
             AddExtension = true,
             DefaultExt = ".h",
             Filter = Const.HeaderFilters,
@@ -270,14 +280,68 @@ namespace PinGenerator.ViewModels
 
          if (dialog.ShowDialog() == true)
          {
-            Project.ExportPath = dialog.FileName;
+            Project.ExportCodePath = dialog.FileName;
          }
+      }
+
+      private void BrowseExportDoc()
+      {
+         SaveFileDialog dialog = new()
+         {
+            FileName = string.IsNullOrEmpty(Project.ExportDocPath) ? $"{Project.Name}Pinout.md" : Project.ExportDocPath,
+            Title = "Doc Export Path",
+            AddExtension = true,
+            DefaultExt = ".md",
+            Filter = Const.MDFilters,
+            CustomPlaces = Const.CustomExportDirs,
+         };
+
+         if (dialog.ShowDialog() == true)
+         {
+            Project.ExportDocPath = dialog.FileName;
+         }
+      }
+
+      private void Export()
+      {
+         if (Project is null) return;
+         //ExportCode();
+         //ExportDoc();
+
+         IsCodeExported = false;
+         IsDocExported = false;
+         CodeExporter.ExportAsync(Project).GetAwaiter().OnCompleted(() =>
+         {
+            IsCodeExported = true;
+         });
+         MarkdownExporter.ExportAsync(Project).GetAwaiter().OnCompleted(() =>
+         {
+            IsDocExported = true;
+         });
       }
 
       private void ExportCode()
       {
          if (Project is null) return;
-         CodeExporter.Export(Project);
+         //CodeExporter.Export(Project);
+
+         IsCodeExported = false;
+         CodeExporter.ExportAsync(Project).GetAwaiter().OnCompleted(() =>
+         {
+            IsCodeExported = true;
+         });
+      }
+
+      private void ExportDoc()
+      {
+         if (Project is null) return;
+         //MarkdownExporter.Export(Project);
+
+         IsDocExported = false;
+         MarkdownExporter.ExportAsync(Project).GetAwaiter().OnCompleted(() =>
+         {
+            IsDocExported = true;
+         });
       }
       #endregion
 
@@ -405,6 +469,8 @@ namespace PinGenerator.ViewModels
          set
          {
             _isSaved = value;
+            IsCodeExported = null;
+            IsDocExported = null;
             OnPropertyChanged();
             OnPropertyChanged(nameof(Title));
          }
@@ -449,6 +515,33 @@ namespace PinGenerator.ViewModels
             _isSerialPin = value;
             OnPropertyChanged();
          }
+      }
+
+      public bool? IsCodeExported
+      {
+         get => _isCodeExported;
+         set
+         {
+            _isCodeExported = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(ExportComplete));
+         }
+      }
+
+      public bool? IsDocExported
+      {
+         get => _isDocExported;
+         set
+         {
+            _isDocExported = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(ExportComplete));
+         }
+      }
+
+      public bool? ExportComplete
+      {
+         get => IsCodeExported == true && IsDocExported == true;
       }
       #endregion
       #endregion

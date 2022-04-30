@@ -15,7 +15,7 @@ namespace PinGenerator.Models
       #region Methods
       public static void Export(Project proj)
       {
-         if (!string.IsNullOrEmpty(proj.ExportPath))
+         if (!string.IsNullOrEmpty(proj.ExportCodePath))
          {
             StringBuilder sb = BuildHeader();
             BuildDigitalCompContainer(sb, proj.Micro.DigitalComponents);
@@ -23,8 +23,16 @@ namespace PinGenerator.Models
             BuildSerialCompContainer(sb, proj.Micro.Serial);
             BuildFooter(sb);
 
-            SaveFile(proj.ExportPath, sb.ToString());
+            SaveFile(proj.ExportCodePath, sb.ToString());
          }
+      }
+
+      public static async Task ExportAsync(Project project)
+      {
+         await Task.Run(() =>
+         {
+            Export(project);
+         });
       }
 
       private static StringBuilder BuildHeader()
@@ -69,25 +77,6 @@ namespace PinGenerator.Models
          sb.AppendLine("}");
       }
 
-      //private static void BuildSerialCompContainer(StringBuilder sb, IEnumerable<Serial> serials)
-      //{
-      //   List<SerialComponent> components = new();
-      //   foreach (var serial in serials)
-      //   {
-      //      components.AddRange(serial.Components);
-      //   }
-
-      //   sb.AppendLine("namespace Ser {");
-      //   foreach (var comp in components)
-      //   {
-      //      if (comp.SelectPin is not null)
-      //      {
-      //         sb.AppendLine($"\tconst int {comp.Name}_{comp.SelectPin.Name}_Pin = {comp.SelectPin.PinNumber};");
-      //      }
-      //   }
-      //   sb.AppendLine("}");
-      //}
-
       private static void BuildSerialCompContainer(StringBuilder sb, IEnumerable<Serial> serials)
       {
          sb.AppendLine("namespace Ser {");
@@ -100,20 +89,28 @@ namespace PinGenerator.Models
                sb.AppendLine($"\t\tconst int {pin.Name} = {pin.PinNumber};");
             }
 
-            sb.AppendLine();
-            foreach (var comp in serial.Components)
+
+            if (serial.Components.Any(c => c.Address is null))
             {
-               if (comp.Address is not null)
-               {
-                  sb.AppendLine($"\t\tconst int {comp.Name}_ADDR = {comp.Address};");
-               }
+               sb.AppendLine();
             }
-            sb.AppendLine();
             foreach (var comp in serial.Components)
             {
                if (comp.Address is null)
                {
                   sb.AppendLine($"\t\tconst int {comp.Name}_{comp.SelectPin?.Name} = {comp.SelectPin?.PinNumber};");
+               }
+            }
+
+            if (serial.Components.Any(c => c.Address is not null))
+            {
+               sb.AppendLine();
+            }
+            foreach (var comp in serial.Components)
+            {
+               if (comp.Address is not null)
+               {
+                  sb.AppendLine($"\t\tconst int {comp.Name}_ADDR = {comp.Address};");
                }
             }
             sb.AppendLine("\t}");

@@ -15,7 +15,8 @@ namespace PinGenerator.ViewModels
       #region Local Props
       private string _projName = "New Project";
       private string? _path = null;
-      private string? _exportPath = null;
+      private string? _exportCodePath = null;
+      private string? _exportDocPath = null;
       private ObservableCollection<string> _micros = new(MicroController.Micros.Keys);
       private string? _selectedMicro = null;
 
@@ -26,7 +27,8 @@ namespace PinGenerator.ViewModels
       #region Commands
       public Command CreateProjectCmd { get; init; }
       public Command BrowsePathCmd { get; init; }
-      public Command BrowseExpPathCmd { get; init; }
+      public Command BrowseExpCodePathCmd { get; init; }
+      public Command BrowseExpDocPathCmd { get; init; }
       #endregion
       #endregion
 
@@ -37,21 +39,22 @@ namespace PinGenerator.ViewModels
 
          CreateProjectCmd = new(CreateProject);
          BrowsePathCmd = new(BrowsePath);
-         BrowseExpPathCmd = new(BrowseExportPath);
+         BrowseExpCodePathCmd = new(BrowseExportCodePath);
+         BrowseExpDocPathCmd = new(BrowseExportDocPath);
       }
       #endregion
 
       #region Methods
       private void CreateProject()
       {
-         if (SelectedMicro is null || Path is null || ExportPath is null) return;
+         if (SelectedMicro is null || Path is null || ExportCodePath is null) return;
 
          var micro = MicroController.GetMicro(SelectedMicro);
 
          if (micro is null) return;
          var newMicro = MicroController.CopyMicro(micro);
 
-         createdDelegate(Project.Create(ProjectName, Path, ExportPath, newMicro));
+         createdDelegate(Project.Create(ProjectName, Path, ExportCodePath, ExportDocPath, newMicro));
       }
 
       private void BrowsePath()
@@ -72,21 +75,39 @@ namespace PinGenerator.ViewModels
          }
       }
 
-      private void BrowseExportPath()
+      private void BrowseExportCodePath()
       {
          SaveFileDialog dialog = new()
          {
             AddExtension = true,
             DefaultExt = ".h",
             Filter = Const.HeaderFilters,
-            Title = "Select Project Save File",
+            Title = "Select Project Export File",
             FileName = $"{ProjectName}Pinout.h",
             CustomPlaces = Const.CustomExportDirs
          };
 
          if (dialog.ShowDialog() == true)
          {
-            ExportPath = dialog.FileName;
+            ExportCodePath = dialog.FileName;
+         }
+      }
+
+      private void BrowseExportDocPath()
+      {
+         SaveFileDialog dialog = new()
+         {
+            AddExtension = true,
+            DefaultExt = ".md",
+            Filter = Const.MDFilters,
+            Title = "Select Project Doc File",
+            FileName = $"{ProjectName}Pinout.md",
+            CustomPlaces = Const.CustomExportDirs
+         };
+
+         if (dialog.ShowDialog() == true)
+         {
+            ExportDocPath = dialog.FileName;
          }
       }
       #endregion
@@ -132,12 +153,22 @@ namespace PinGenerator.ViewModels
          }
       }
 
-      public string? ExportPath
+      public string? ExportCodePath
       {
-         get => _exportPath;
+         get => _exportCodePath;
          set
          {
-            _exportPath = value;
+            _exportCodePath = value;
+            OnPropertyChanged();
+         }
+      }
+
+      public string? ExportDocPath
+      {
+         get => _exportDocPath;
+         set
+         {
+            _exportDocPath = value;
             OnPropertyChanged();
          }
       }

@@ -13,7 +13,8 @@ namespace PinGenerator.Models
       #region Local Props
       private string _name = "Empty Project";
       private string? _path = null;
-      private string? _exportPath = null;
+      private string? _exportCodePath = null;
+      private string? _exportDocPath = null;
       //private ObservableCollection<Component> _comps = new();
       private MicroController _micro = new();
       #endregion
@@ -32,14 +33,25 @@ namespace PinGenerator.Models
             Micro = micro,
          };
       }
-      public static Project Create(string name, string path, string exportPath, MicroController micro)
+      public static Project Create(string name, string path, string exportCodePath, MicroController micro)
       {
          return new()
          {
             Name = name,
             Path = path,
             Micro = micro,
-            ExportPath = exportPath,
+            ExportCodePath = exportCodePath,
+         };
+      }
+      public static Project Create(string name, string path, string exportCodePath, string exportDocPath, MicroController micro)
+      {
+         return new()
+         {
+            Name = name,
+            Path = path,
+            Micro = micro,
+            ExportCodePath = exportCodePath,
+            ExportDocPath = exportDocPath
          };
       }
       #endregion
@@ -65,25 +77,25 @@ namespace PinGenerator.Models
          }
       }
 
-      public string? ExportPath
+      public string? ExportCodePath
       {
-         get => _exportPath;
+         get => _exportCodePath;
          set
          {
-            _exportPath = value;
+            _exportCodePath = value;
             OnPropertyChanged();
          }
       }
 
-      //public ObservableCollection<Component> Components
-      //{
-      //   get => _comps;
-      //   set
-      //   {
-      //      _comps = value;
-      //      OnPropertyChanged();
-      //   }
-      //}
+      public string? ExportDocPath
+      {
+         get => _exportDocPath;
+         set
+         {
+            _exportDocPath = value;
+            OnPropertyChanged();
+         }
+      }
 
       public MicroController Micro
       {

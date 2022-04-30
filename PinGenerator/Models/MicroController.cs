@@ -128,6 +128,7 @@ namespace PinGenerator.Models
          }
          return new MicroController
          {
+            Name = micro.Name,
             AnalogPinCount = micro.AnalogPinCount,
             DigitalPinCount = micro.DigitalPinCount,
             Serial = new(serials)

@@ -22,5 +22,6 @@ namespace PinGenerator.Models
 
       public static readonly string FileFilters = "Pin File|*.pin|All Files|*.*";
       public static readonly string HeaderFilters = "Header File|*.h|All Files|*.*";
+      public static readonly string MDFilters = "Markdown File|*.md|All Files|*.*";
    }
 }

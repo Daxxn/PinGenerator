@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:PinGenerator.Views"
         xmlns:models="clr-namespace:PinGenerator.Models"
         mc:Ignorable="d"
-        Title="New Project" Height="220" Width="300">
+        Title="New Project" Height="240" Width="300">
     <Window.Resources>
         <Style TargetType="Border" x:Key="ItemBorder">
             <Setter Property="Padding" Value="2,2,2,4"/>
@@ -14,6 +14,7 @@
     </Window.Resources>
     <Grid Grid.IsSharedSizeScope="True">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -56,13 +57,27 @@
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-                <TextBlock>Export Path</TextBlock>
-                <TextBox Grid.Column="1" Text="{Binding Path=ExportPath, UpdateSourceTrigger=PropertyChanged}"/>
-                <Button Command="{Binding Path=BrowseExpPathCmd}" Grid.Column="2" FontSize="11" Padding="2">Browse</Button>
+                <TextBlock>Code Export</TextBlock>
+                <TextBox Grid.Column="1" Text="{Binding Path=ExportCodePath, UpdateSourceTrigger=PropertyChanged}"/>
+                <Button Command="{Binding Path=BrowseExpCodePathCmd}" Grid.Column="2" FontSize="11" Padding="2">Browse</Button>
             </Grid>
         </Border>
 
         <Border Grid.Row="3" Style="{StaticResource ItemBorder}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition SharedSizeGroup="a"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock>Doc Export</TextBlock>
+                <TextBox Grid.Column="1" Text="{Binding Path=ExportDocPath, UpdateSourceTrigger=PropertyChanged}"/>
+                <Button Command="{Binding Path=BrowseExpDocPathCmd}" Grid.Column="2" FontSize="11" Padding="2">Browse</Button>
+            </Grid>
+        </Border>
+
+        <Border Grid.Row="4" Style="{StaticResource ItemBorder}">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -80,6 +95,6 @@
             </Grid>
         </Border>
 
-        <Button Grid.Row="5" Click="Create_Click" Command="{Binding Path=CreateProjectCmd}">Create New Project</Button>
+        <Button Grid.Row="6" Click="Create_Click" Command="{Binding Path=CreateProjectCmd}">Create New Project</Button>
     </Grid>
 </Window>
