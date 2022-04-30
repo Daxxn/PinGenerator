@@ -1,33 +1,28 @@
 ﻿using MVVMLibrary;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace PinGenerator.Models
 {
-   public class SerialComponent : Model
+   public class MicroControllerTemplate : Model
    {
       #region Local Props
       private string _name = "";
-      private int? _address = null;
-      private Pin _selectPin = new();
+      private uint _digitalPinCount = 0;
+      private uint _analogPinCount = 0;
+      private ObservableCollection<Serial> _serialComponents = new();
       #endregion
 
       #region Constructors
-      public SerialComponent() { }
+      public MicroControllerTemplate() { }
       #endregion
 
       #region Methods
-      public static SerialComponent Create(string name, int address)
-      {
-         return new SerialComponent() { Name = name, Address = address };
-      }
-      public static SerialComponent Create(string name, Pin selectPin)
-      {
-         return new SerialComponent() { Name = name, SelectPin = selectPin };
-      }
+
       #endregion
 
       #region Full Props
@@ -41,23 +36,32 @@ namespace PinGenerator.Models
          }
       }
 
-      public int? Address
+      public uint DigitalPinCount
       {
-         get => _address;
+         get => _digitalPinCount;
          set
          {
-            _address = value;
+            _digitalPinCount = value;
             OnPropertyChanged();
          }
       }
 
-      public Pin SelectPin
+      public uint AnalogPinCount
       {
-         get => _selectPin;
+         get => _analogPinCount;
          set
          {
-            _selectPin = value;
-            _address = null;
+            _analogPinCount = value;
+            OnPropertyChanged();
+         }
+      }
+
+      public ObservableCollection<Serial> Serial
+      {
+         get => _serialComponents;
+         set
+         {
+            _serialComponents = value;
             OnPropertyChanged();
          }
       }

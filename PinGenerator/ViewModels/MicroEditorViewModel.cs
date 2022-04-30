@@ -62,13 +62,16 @@ namespace PinGenerator.ViewModels
 
       private void NewMicro()
       {
-         Micros.Add(new());
+         MicroController micro = new();
+         Micros.Add(micro);
+         SelectedMicro = micro;
       }
 
       private void RemoveMicro()
       {
          if (SelectedMicro is null) return;
          Micros.Remove(SelectedMicro);
+         SelectedMicro = null;
       }
 
       private void AddSerial()
@@ -81,6 +84,7 @@ namespace PinGenerator.ViewModels
       {
          if (SelectedMicro is null || SelectedSerial is null) return;
          SelectedMicro.RemoveSerial(SelectedSerial);
+         SelectedSerial = null;
       }
 
       private void AddSerialPin()
@@ -93,6 +97,7 @@ namespace PinGenerator.ViewModels
       {
          if (SelectedSerial is null || SelectedSerialPin is null) return;
          SelectedSerial.RemovePin(SelectedSerialPin);
+         SelectedSerialPin = null;
       }
 
       private void SaveMicros()

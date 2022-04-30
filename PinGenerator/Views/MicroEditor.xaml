@@ -66,7 +66,7 @@
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
 
                             <TextBlock>Name</TextBlock>
@@ -88,7 +88,7 @@
                                 <Grid>
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="Auto"/>
-                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="*"/>
                                     </Grid.RowDefinitions>
                                     <StackPanel Orientation="Horizontal">
                                         <Button Click="AddSerial_Click">+</Button>
@@ -99,6 +99,7 @@
                                         ItemsSource="{Binding Path=Serial}"
                                         SelectionChanged="Serial_Selected"
                                         HorizontalContentAlignment="Stretch"
+                                        ScrollViewer.VerticalScrollBarVisibility="Visible"
                                     >
                                         <ListView.ItemTemplate>
                                             <DataTemplate>

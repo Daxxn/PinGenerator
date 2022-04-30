@@ -24,8 +24,11 @@ namespace PinGenerator.ViewModels
       private Component? _selectedComp = null;
       private Component? _selectedDigitalComp = null;
       private Component? _selectedAnalogComp = null;
+      private SerialComponent? _selectedSerialComp = null;
       private Pin? _selectedPin = null;
       private Serial? _selectedSerial = null;
+
+      private bool _isSerialPin = false;
 
       private string? _newCompName = null;
       private uint? _newCompPins = null;
@@ -39,6 +42,7 @@ namespace PinGenerator.ViewModels
       public Command OpenProjectCmd { get; init; }
       public Command SaveProjectCmd { get; init; }
       public Command NewCompCmd { get; init; }
+      public Command RemCompCmd { get; init; }
       public Command GenSelectedPinsCmd { get; init; }
       public Command BrowseExportCmd { get; init; }
       public Command ExportCmd { get; init; }
@@ -48,59 +52,17 @@ namespace PinGenerator.ViewModels
       #region Constructors
       public MainViewModel()
       {
-         #region Test Models
-         //Project = new()
-         //{
-         //   Name = "Project Test",
-         //   Micro = new()
-         //   {
-         //      DigitalPinCount = 16,
-         //      AnalogPinCount = 8,
-         //      DigitalComponents = new()
-         //      {
-         //         new() { Name = "Test 1", PinCount = 8},
-         //         new() { Name = "Test 2", PinCount = 4}
-         //      },
-         //      AnalogComponents = new()
-         //      {
-         //         new() { Name = "Test 3", PinCount = 7 },
-         //         new() { Name = "Test 4", PinCount = 16 },
-         //      },
-         //      Serial = new()
-         //      {
-         //         new() {
-         //            Name = "I2C",
-         //            Pins = new() { new() { Name = "I2C_SCLK", PinNumber = 8, }, new() { Name = "I2C_SDA", PinNumber = 9 } },
-         //            Components  = new()
-         //            {
-         //               new() { Name = "IO Expander", Address = 42 },
-         //               new() { Name = "RTC", Address = 24 }
-         //            }
-         //         },
-         //         new()
-         //         {
-         //            Name = "SPI",
-         //            Pins = new() { new() { Name = "SPI_SCLK", PinNumber=10}, new() { Name ="SPI_MOSI", PinNumber=11}, new() { Name ="SPI_MISO", PinNumber=12} },
-         //            Components = new()
-         //            {
-         //               new() { Name="Temp Sensor", SelectPin = new() { Name ="THERMO_CS", PinNumber=13} }
-         //            }
-         //         }
-         //      }
-         //   }
-         //};
-         #endregion
-
          #region Commands Init
-         OpenProjectCmd  = new(OpenProject);
-         SaveProjectCmd  = new(SaveProject);
+         OpenProjectCmd     = new(OpenProject);
+         SaveProjectCmd     = new(SaveProject);
          GenSelectedPinsCmd = new(GeneratePins);
-         NewCompCmd      = new(NewComponent);
-         BrowseExportCmd = new(BrowseExport);
-         ExportCmd       = new(ExportCode);
+         NewCompCmd         = new(NewComponent);
+         RemCompCmd         = new(RemComp);
+         BrowseExportCmd    = new(BrowseExport);
+         ExportCmd          = new(ExportCode);
          #endregion
 
-         #region Event Init
+         #region Events Init
          IsSaveChanged += MainViewModel_IsSaveChanged;
          #endregion
       }
@@ -205,7 +167,14 @@ namespace PinGenerator.ViewModels
             if (CurrentPinType == 2)
             {
                if (SelectedSerial is null) return;
-               SelectedSerial.NewComponent(NewCompName, (int)NewCompPins);
+               if (IsSerialPin)
+               {
+                  SelectedSerial.NewComponent(NewCompName, new Pin("CS", (uint)NewCompPins));
+               }
+               else
+               {
+                  SelectedSerial.NewComponent(NewCompName, (int)NewCompPins);
+               }
                IsSaved = false;
                return;
             }
@@ -224,6 +193,32 @@ namespace PinGenerator.ViewModels
                GeneratePins();
             }
             IsSaved = false;
+         }
+      }
+
+      private void RemComp()
+      {
+         if (CurrentPinType == 0)
+         {
+            if (SelectedDigitalComponent is null) return;
+
+            Project.Micro.DigitalComponents.Remove(SelectedDigitalComponent);
+            SelectedDigitalComponent = null;
+            SelectedComponent = null;
+         }
+         else if (CurrentPinType == 1)
+         {
+            if (SelectedAnalogComponent is null) return;
+
+            Project.Micro.AnalogComponents.Remove(SelectedAnalogComponent);
+            SelectedAnalogComponent = null;
+            SelectedComponent = null;
+         }
+         else if (CurrentPinType == 2)
+         {
+            if (SelectedSerial is null || SelectedSerialComp is null) return;
+
+            SelectedSerial.Components.Remove(SelectedSerialComp);
          }
       }
 
@@ -302,6 +297,7 @@ namespace PinGenerator.ViewModels
          {
             _proj = value;
             OnPropertyChanged();
+            OnPropertyChanged(nameof(Title));
          }
       }
 
@@ -364,6 +360,16 @@ namespace PinGenerator.ViewModels
          }
       }
 
+      public SerialComponent? SelectedSerialComp
+      {
+         get => _selectedSerialComp;
+         set
+         {
+            _selectedSerialComp = value;
+            OnPropertyChanged();
+         }
+      }
+
       public int CurrentPinType
       {
          get => _currentPinType;
@@ -400,6 +406,7 @@ namespace PinGenerator.ViewModels
          {
             _isSaved = value;
             OnPropertyChanged();
+            OnPropertyChanged(nameof(Title));
          }
       }
 
@@ -430,6 +437,16 @@ namespace PinGenerator.ViewModels
          set
          {
             _newCompPins = value;
+            OnPropertyChanged();
+         }
+      }
+
+      public bool IsSerialPin
+      {
+         get => _isSerialPin;
+         set
+         {
+            _isSerialPin = value;
             OnPropertyChanged();
          }
       }

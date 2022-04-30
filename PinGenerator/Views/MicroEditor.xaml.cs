@@ -31,22 +31,50 @@ namespace PinGenerator.Views
 
       private void AddSerial_Click(object sender, RoutedEventArgs e)
       {
-         VM.AddSerialCmd.Execute(null);
+         if (sender is Button btn)
+         {
+            if (btn.DataContext is MicroController micro)
+            {
+               VM.SelectedSerial = micro.AddSerial("NEW");
+            }
+         }
       }
 
       private void RemSerial_Click(object sender, RoutedEventArgs e)
       {
-         VM.RemSerialCmd.Execute(null);
+         if (VM.SelectedSerial is null) return;
+
+         if (sender is Button btn)
+         {
+            if (btn.DataContext is MicroController micro)
+            {
+               micro.RemoveSerial(VM.SelectedSerial);
+            }
+         }
       }
 
       private void AddSerialPin_Click(object sender, RoutedEventArgs e)
       {
-         VM.AddSerialPinCmd.Execute(null);
+         if (sender is Button btn)
+         {
+            if (btn.DataContext is Serial serial)
+            {
+               VM.SelectedSerialPin = serial.AddPin($"P{serial.Pins.Count}", (uint)serial.Pins.Count);
+            }
+         }
       }
 
       private void RemSerialPin_Click(object sender, RoutedEventArgs e)
       {
-         VM.RemSerialPinCmd.Execute(null);
+         if (VM.SelectedSerialPin is null) return;
+
+         if (sender is Button btn)
+         {
+            if (btn.DataContext is Serial serial)
+            {
+               serial.RemovePin(VM.SelectedSerialPin);
+            }
+         }
       }
 
       private void Serial_Selected(object sender, SelectionChangedEventArgs e)

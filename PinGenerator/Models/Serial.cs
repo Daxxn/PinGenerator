@@ -51,7 +51,7 @@ namespace PinGenerator.Models
          return Pins.Remove(pin);
       }
 
-      public SerialComponent? NewComponent(string name, int address)
+      public SerialComponent? NewComponent(string name, int address, bool isSerialPin = false)
       {
          foreach (var c in Components)
          {
@@ -62,6 +62,21 @@ namespace PinGenerator.Models
          }
 
          var comp = SerialComponent.Create(name, address);
+         Components.Add(comp);
+         return comp;
+      }
+
+      public SerialComponent? NewComponent(string name, Pin selectPin)
+      {
+         foreach (var c in Components)
+         {
+            if (c.Name == name)
+            {
+               return null;
+            }
+         }
+
+         var comp = SerialComponent.Create(name, selectPin);
          Components.Add(comp);
          return comp;
       }

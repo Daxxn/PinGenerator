@@ -18,8 +18,9 @@ namespace PinGenerator.Models
          if (!string.IsNullOrEmpty(proj.ExportPath))
          {
             StringBuilder sb = BuildHeader();
-            BuildCompContainer(sb, proj.Micro.DigitalComponents, true);
-            BuildCompContainer(sb, proj.Micro.AnalogComponents, false);
+            BuildDigitalCompContainer(sb, proj.Micro.DigitalComponents);
+            BuildAnalogCompContainer(sb, proj.Micro.AnalogComponents);
+            BuildSerialCompContainer(sb, proj.Micro.Serial);
             BuildFooter(sb);
 
             SaveFile(proj.ExportPath, sb.ToString());
@@ -29,7 +30,7 @@ namespace PinGenerator.Models
       private static StringBuilder BuildHeader()
       {
          var sb = new StringBuilder("// Auto-Generated code file from PinGenerator.");
-         sb.AppendLine("// Avoid editing this file.");
+         sb.AppendLine("\n// Avoid editing this file.");
          sb.AppendLine();
          sb.AppendLine("#pragma once");
          sb.AppendLine("#include <Arduino.h>");
@@ -46,23 +47,86 @@ namespace PinGenerator.Models
          sb.AppendLine();
       }
 
-      private static void BuildCompContainer(StringBuilder sb, IEnumerable<Component> comps, bool isDigital)
+      private static void BuildAnalogCompContainer(StringBuilder sb, IEnumerable<Component> components)
       {
-         sb.AppendLine(isDigital ? "namespace D {" : "namespace A {");
+         sb.AppendLine("namespace Anlg {");
 
-         foreach (var comp in comps)
+         foreach (var comp in components)
          {
-            BuildComponent(sb, comp);
+            BuildComponent(sb, comp, false);
          }
          sb.AppendLine("}");
       }
 
-      private static void BuildComponent(StringBuilder sb, Component comp)
+      private static void BuildDigitalCompContainer(StringBuilder sb, IEnumerable<Component> components)
+      {
+         sb.AppendLine("namespace Digitl {");
+
+         foreach (var comp in components)
+         {
+            BuildComponent(sb, comp, true);
+         }
+         sb.AppendLine("}");
+      }
+
+      //private static void BuildSerialCompContainer(StringBuilder sb, IEnumerable<Serial> serials)
+      //{
+      //   List<SerialComponent> components = new();
+      //   foreach (var serial in serials)
+      //   {
+      //      components.AddRange(serial.Components);
+      //   }
+
+      //   sb.AppendLine("namespace Ser {");
+      //   foreach (var comp in components)
+      //   {
+      //      if (comp.SelectPin is not null)
+      //      {
+      //         sb.AppendLine($"\tconst int {comp.Name}_{comp.SelectPin.Name}_Pin = {comp.SelectPin.PinNumber};");
+      //      }
+      //   }
+      //   sb.AppendLine("}");
+      //}
+
+      private static void BuildSerialCompContainer(StringBuilder sb, IEnumerable<Serial> serials)
+      {
+         sb.AppendLine("namespace Ser {");
+         foreach (var serial in serials)
+         {
+            if (serial.Components.Count == 0) break;
+            sb.AppendLine($"\tnamespace {serial.Name} {{");
+            foreach (var pin in serial.Pins)
+            {
+               sb.AppendLine($"\t\tconst int {pin.Name} = {pin.PinNumber};");
+            }
+
+            sb.AppendLine();
+            foreach (var comp in serial.Components)
+            {
+               if (comp.Address is not null)
+               {
+                  sb.AppendLine($"\t\tconst int {comp.Name}_ADDR = {comp.Address};");
+               }
+            }
+            sb.AppendLine();
+            foreach (var comp in serial.Components)
+            {
+               if (comp.Address is null)
+               {
+                  sb.AppendLine($"\t\tconst int {comp.Name}_{comp.SelectPin?.Name} = {comp.SelectPin?.PinNumber};");
+               }
+            }
+            sb.AppendLine("\t}");
+         }
+         sb.AppendLine("}");
+      }
+
+      private static void BuildComponent(StringBuilder sb, Component comp, bool isDigital)
       {
          sb.AppendLine($"\t{comp.Export()}");
          foreach (var pin in comp.Pins)
          {
-            sb.AppendLine($"\t{pin.Export()}");
+            sb.AppendLine($"\t\tconst int {pin.Name}_PIN = {(!isDigital ? "A" : "")}{pin.PinNumber};");
          }
          sb.AppendLine("\t}");
       }

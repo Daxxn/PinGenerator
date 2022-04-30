@@ -49,8 +49,9 @@ namespace PinGenerator.ViewModels
          var micro = MicroController.GetMicro(SelectedMicro);
 
          if (micro is null) return;
+         var newMicro = MicroController.CopyMicro(micro);
 
-         createdDelegate(Project.Create(ProjectName, Path, ExportPath, micro));
+         createdDelegate(Project.Create(ProjectName, Path, ExportPath, newMicro));
       }
 
       private void BrowsePath()

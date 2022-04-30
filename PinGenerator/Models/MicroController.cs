@@ -114,14 +114,36 @@ namespace PinGenerator.Models
          return null;
       }
 
-      public void AddSerial(string name)
+      public static MicroController CopyMicro(MicroController micro)
+      {
+         var serials = new List<Serial>();
+         foreach (var ser in micro.Serial)
+         {
+            var newSerial = new Serial()
+            {
+               Name = ser.Name,
+               Pins = ser.Pins
+            };
+            serials.Add(newSerial);
+         }
+         return new MicroController
+         {
+            AnalogPinCount = micro.AnalogPinCount,
+            DigitalPinCount = micro.DigitalPinCount,
+            Serial = new(serials)
+         };
+      }
+
+      public Serial? AddSerial(string name)
       {
          foreach (var ser in Serial)
          {
-            if (ser.Name == name) return;
+            if (ser.Name == name) return null;
          }
 
-         Serial.Add(new() { Name = name });
+         Serial serial = new() { Name = name };
+         Serial.Add(serial);
+         return serial;
       }
 
       public bool RemoveSerial(Serial ser)
